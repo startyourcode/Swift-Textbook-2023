@@ -389,17 +389,19 @@ if enterdPasscode || passedFaceID {
 
 定数`enterdPasscode`が`true`なので、このプログラムを実行するとiPhoneのロックは解除されます。
 
-## 8. 論理演算子
+## 8. 論理否定演算子
 _08_logical NOT operator.playground_
 
 Swiftの論理演算は論理積と論理和の他に**論理否定**があります。
 論理否定は`Bool`値の真偽を反転する演算です。
 Swiftプログラミングでは、疑問符`!`の論理否定演算子を使って、これを実行できます。
 論理否定演算子は「真偽値の直前」に記述する、いわゆる前置き演算子です。
+
 ```swift
 !true   // false; not true
 !false  // true; not false
 ```
+
 `true`の論理否定は`false`、`false`の論理否定は`true`になります。
 論理否定演算子!を英語の*not*に置き換えると、1行目は`not true`、2行目は`not false`と読むことができるので、コードの意味が理解できます。
 \
