@@ -1,0 +1,317 @@
+# 第9章 列挙型とSwitch分岐構文
+## 1. 列挙型の基本
+_01_enumerations.playground_
+
+「関連性のあるデータ」を、ひとつのグループとしてモデル化しておくと便利な場合があります。
+Swiftでは、このようなデータを**列挙型**（enumeration）として定義できます。
+列挙型を定義するには、`enum`キーワードを使います。
+例えば、コーヒーやジュースなどの「飲み物のサイズ」を考えてみましょう。
+次のコードは、列挙型として「飲み物のサイズ」定義します。
+
+```swift
+enum DrinkSize {
+}
+```
+
+列挙型の定義では、「そのデータがとりうる値」を`case`節に記述します。
+ここでは、「飲み物のサイズ」は小・中・大の3種類から選べるものとします。
+
+```swift
+enum DrinkSize {
+    case small
+    case medium
+    case large
+}
+```
+
+単純な列挙型では、それぞれの値をひとつの`case`節にまとめて記述することもできます。
+
+```swift
+enum DrinkSize {
+    case small, medium, large
+}
+```
+
+独自の列挙型として、`DrinkSize`型を定義できました。
+
+列挙型のインスタンスを作成するにあたって、イニシャライザは不要です。
+次のコードは、「飲み物の小さいサイズ」を示す列挙型インスタンスを作成できます。
+
+```swift
+let smallSize = DrinkSize.small
+```
+
+この定数`smallSize`を呼び出すと、飲み物の「小さいサイズ」を示す列挙値を返します。
+
+```swift
+smallSize // small
+```
+
+代入先の変数および定数について「列挙型である」ことが自明な場合、代入する側の型名を省略できます。
+次のコードにおいて、変数`coffeeSize`は`DrinkSize`型であることが型アノテーションによって明示されています。
+したがって、代入演算子の右辺では、「ドット以前の型名」を省略して記述しています。
+```swift
+var coffeeSize: DrinkSize = .medium    // medium
+```
+
+この変数を宣言した以降の行では、コンパイラは「変数`coffeeSize`が列挙型である」ことを知っています。
+そのため、値を更新する際には直接、型情報を省略したケース値だけを記述できます。
+```swift
+coffeeSize = .large    // large
+```
+
+列挙型を利用することによって、そのデータがとりうる値を「いくつかのケース」に制限できます。
+この仕組みによって、Swiftはより安全なプログラムの構築を可能にしています。
+
+## 2.  列挙型の関連値
+_02_associated values.playground_
+
+列挙型は、そこに定義されたケース自体が値となる
+列挙型の値に、別の型を持つ具体的なデータを設定できると便利
+列挙ケースに**関連値**を定義しておくと、より具体的な値を設定できるようになります。
+
+例として、連絡先をメールアドレスと電話番号の2つの形式で追跡するプログラムを考えます。
+
+次の列挙型には、メールアドレスと電話番号という2つのケースがあります。
+ 
+```swift
+enum Contact {
+    case email
+    case phone
+}
+```
+ 
+ このように定義された列挙型の値は、「アドレスか、番号か」のどちらかを選択することしかできません。
+ 付加的な情報として関連値を定義することで、その具体的な値も保持できるようになります。
+ 
+ 
+ 
+ 
+ ```swift
+ enum Contact {
+     case email(String)
+     case phone(Int, Int, Int)
+ }
+ ```
+ 
+ 
+ 
+ 
+ ```swift
+ var friendContact = Contact.email("hello@iCloud.com")
+ print(friendContact)
+ ```
+ 
+ 
+ 
+ 
+ ```swift
+ friendContact = .phone(090, 1234, 5678)
+ print(friendContact)
+ ```
+ 
+## 3. 列挙型の未加工値
+_03_raw values.playground_
+
+列挙型に定義されているそれぞれのケースには、既定値を設定しておくことができます。
+この既定値を**未加工値**といいます。
+未加工値には「文字列、文字、整数、小数点数のいずれかの値」を設定できますが、ひとつの列挙型に設定する未加工値は「すべて同じ型にする」必要があります。
+例として、血液型を扱うプログラムを考えます。
+
+次のコードは、血液型の種類をモデル化した列挙型の`BloodType`型の定義です。
+
+```swift
+enum BloodType {
+    case a
+    case b
+    case o
+    case ab
+}
+```
+
+列挙型に未加工値を設定するには、型アノテーションで「設定する既定値の型」を宣言します。
+ここでは、「未加工値が文字列型である」ことを宣言します。
+そして、ケースごとに「具体的な既定値」を設定します。
+
+```swift
+enum BloodType: String {
+    case a = "A"
+    case b = "B"
+    case o = "O"
+    case ab = "AB"
+}
+```
+
+未加工値を取得するには、その列挙値の`rawValue`プロパティにアクセスします。
+
+```swift
+BloodType.b.rawvalue // "B"
+```
+
+未加工値を定数や変数に保持すると、その型が「列挙型ではなく、未加工値の型」になっていることがわかります。
+
+```swift
+let bloodTypeRawValue = BloodType.b.rawvalue // Value is type of String.
+```
+
+列挙型の未加工値と関連値はまったく異なる概念です。
+未加工値とは「列挙型を定義する際にあらかじめ値を設定しておく」ものです。
+つまり、列挙型の未加工値は変更できません。
+対照的に、関連値は列挙ケースに基づいて「定数や変数を新たに作成するときに割り当てる値」です。
+関連値は定数や変数を作成した後も、型が適切であれば何度でも値を更新できます。
+
+## 4. 未加工値を暗黙的に設定する
+_04_implicit assigned raw values.playground_
+
+列挙型に未加工値を使用するとき、各ケースの「未加工値を設定する記述」を省略できる場合があります。
+Swiftは、記述が省略されたケースに自動的に値を設定します。
+
+例えば、未加工値に整数を設定する場合、各ケースの値は「直前のケースに1を加算した整数」になります。
+ここでは「週の曜日」を扱うプログラムを考えます。
+日曜日から始まって、土曜日までの七日間を順番にケースとして列挙します。
+
+```swift
+enum Weekday {
+   case sunday, monday, tuesday, wednesday, thursday, friday, saturday
+}
+```
+
+未加工値の型を整数として宣言して、先頭ケースにだけ`1`を設定します。
+
+```swift
+enum Weekday: Int {
+   case sunday = 1, monday, tuesday, wednesday, thursday, friday, saturday
+}
+```
+
+すると、先頭以降のケースには、自動的に未加工値が設定されます。
+自動的に設定された未加工値は1だけ加算されるので、月曜日の未加工値は`2`です。
+
+```swift
+Weekday.monday.rawValue    // 2
+```
+
+先頭ケースに対する未加工値の設定が省略されている場合、自動的に0が設定されます。
+「日曜日に設定した未加工値」を省略してみましょう。
+
+```swift
+enum Weekday: Int {
+   case sunday , monday, tuesday, wednesday, thursday, friday, saturday
+}
+```
+
+すると、先頭ケースの日曜日が暗黙的に`0`になるので、月曜日の未加工値は`1`に変化します。
+
+```swift
+Weekday.monday.rawValue    // 1
+```
+
+未加工値の型を文字列として宣言した場合、暗黙的に「各ケースの名前」が未加工値として設定されます。
+血液型の列挙型は、ケース名自体を未加工値として利用しても、問題なさそうです。
+
+```swift
+enum BloodType: String {
+   case A
+   case B
+   case O
+   case AB
+}
+```
+
+`rawValue`プロパティにアクセスすると、文字列の未加工値を取得できます。
+ 
+```swift
+BloodType.AB.rawValue  // "AB"
+```
+
+## 5. 未加工値による列挙値の初期化
+_05_initializing from a raw value.playground_
+
+未加工値がある列挙型は、その未加工値を使って新しい列挙値を初期化できます。
+未加工値を使って新しい列挙値を初期化するには、「未加工値と同じ型の値」を受け取るイニシャライザを呼び出します。
+
+例として、1月から12月までの暦（こよみ）を扱うプログラムを考えます。
+
+```swift
+enum Month {
+    case january, february, march, april, june, july, august, september, octber, november, december
+}
+```
+
+この列挙型には、先頭を`1`とした整数の未加工値を設定しておきます。
+
+```swift
+enum Month: Int {
+    case january = 1, february, march, april, june, july, august, september, octber, november, december
+}
+```
+
+自動的に設定される暦の未加工値は`12`までしかない点に注目してください。
+ここでは、パラメータの未加工値に「13番目」を指定して初期化します。
+
+```swift
+Month(rawValue: 13)    // nil
+```
+
+このコードは「存在しない13番目の列挙ケース」を初期化しようとするので、失敗して`nil`を返します。
+
+「定義されていない未加工値」の列挙型インスタンスを初期化しようとすると、イニシャライザは失敗します。
+これは、「未加工値と同じ型の値」を受け取るイニシャライザは常に、失敗する可能性があることを意味しています。
+言い換えると、「未加工値と同じ型の値」を受け取るイニシャライザは「オプショナルな列挙値」を返すということです。
+つまり、`nil`を返すかもしれない「失敗できるイニシャライザ」です。
+このイニシャライザで初期化した値を使用する際は、オプショナル・バインディングで安全にアンラップする必要があります。
+
+```swift
+if let birthMonth = Month(rawValue: 6) {
+    print("You are born in \(birthMonth).")
+} else {
+    print("Month can be any of 1-12.")
+}
+Prints You are born in june.
+```
+
+`1`から`12`までの未加工値を指定した場合、具体的な列挙値を作成することができます。
+したがって、`if`ステートメントのボディが実行されます。
+万が一、存在しない未加工値が指定された場合は、`else`節のコードが実行されます。
+
+## 6.Switch分岐構文の基本
+_06_switch statements.playground_
+
+注文された飲み物のサイズに基づいて、出力するメッセージを制御するプログラム
+評価値と一致するケース節の手続きが実行される
+それ以外の結果は、default節で対応する
+breakキーワードを使えば、何もしないでswitchステートメントを修了できる
+
+```swift
+var orderedDrinkSize = "M"
+switch orderedDrinkSize {
+case "S":
+    print("A small drink was ordered.")
+case "M":
+    print("A medium drink was ordered.")
+case "L":
+    print("A large drink was ordered.")
+default:
+    break
+}
+```
+
+strawberryの規格
+Sサイズ:  6g~10g
+Mサイズ:  10~15g
+Lサイズ:  15~20g
+2Lサイズ: 20~28g
+3Lサイズ: 28~37g
+デラックス: 37g〜
+
+```swift
+var spec = "out of spec"   // before evaluation
+var wightOfstrawberry = 10  // grams
+switch wightOfstrawberry {
+case let weight where weight <= 6:
+    spec = "S"
+default:
+    spec = "Deluxe"
+}
+print("The strawberry is \(spec) size.")
+```
