@@ -277,7 +277,7 @@ enum Direction: Int {
     case north = 1, east, southern, west
 
     var isHeadingNorth: Bool {
-        return self == .north ? true : false
+        return self == .north
     }
 }
 
@@ -285,7 +285,7 @@ var currentDirection = Direction.east
 currentDirection.isHeadingNorth     // false
 ```
 
-`isHeadingNorth`プロパティの実装では、三項演算子を使って自身のインスタンスが「列挙ケースの`notrh`と等しいかどうか」を評価しています。
+`isHeadingNorth`プロパティは「自身のインスタンスが列挙ケースの`notrh`と等しいかどうか」を評価した結果を返しています。
 
 ## 5.  列挙型の付属値
 _05\_associated values.playground_
