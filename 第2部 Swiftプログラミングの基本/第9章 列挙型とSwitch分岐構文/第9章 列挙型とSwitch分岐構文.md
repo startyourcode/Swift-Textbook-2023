@@ -74,7 +74,7 @@ bananaAulaitSize = .large
 したがって、値を更新する際にはケース値の型名を省略できます。
 
 ## 2. 列挙型の実体値
-_03_raw values.playground_
+_03\_raw values.playground_
 
 列挙型の定義する際、ケースに既定値を設定できます。
 この既定値を列挙ケースの**実体値**といいます。
@@ -158,7 +158,7 @@ BloodType.AB.rawValue   // "AB"
 `BloodType`型の実態値には、「各ケースの名前」が暗黙的に設定されています。
 
 ## 4. 基本値による列挙値の初期化
-_05_initializing from a raw value.playground_
+_05\_initializing from a raw value.playground_
 
 実体値がある列挙型は、その実体値を使って新しい列挙値を初期化できます。
 実体値を使って新しい列挙値を初期化するには、`init(rawValue:)`イニシャライザを呼び出します。
@@ -205,11 +205,15 @@ let diractionNorth = Direction()    // north
 なお、`init(rawValue:)?`メソッドを実装すれば、自動的に提供される「実体値を指定するイニシャライザ」も上書き定義できます。
 
 ## 列挙型のメソッド
+_0\_enumeration methods.playground_
 
-列挙型はデータをモデル化する正当な手段のひとつであり、れっきとした型として扱える
-構造体などと同じように、メソッドを定義できることを意味する
-これにはパラメータを受け取るメソッド、値を返すメソッド、自己可変メソッドを含む
-さらに、`static`キーワードを使えば、型メソッドも実装できる
+Swiftの列挙型はデータをモデル化する正当な手段のひとつであり、れっきとした型として扱えます。
+これは、構造体などと同じようにメソッドを定義できることを意味します。
+
+***
+
+以下に定義する`Direction`型は東西南北の方位をモデル化する列挙型です。
+`getOpposite()`メソッドは、自身のインスタンスが示す方位と反対方向を返します。
 
 ```swift
 enum Direction: Int {
@@ -225,6 +229,12 @@ var currentDirection = Direction.east
 currentDirection.getOpposite()  // west
 ```
 
+`getOpposite()`メソッドの実装では、反対方向を算出するために整数の実体値を利用しています。
+その際、`self`キーワードを使って自身のインスタンスを参照している点に注目してください。
+なお、通常のメソッドと同様に列挙型のメソッドもパラメータを受け取ることができます。
+
+`mutating`キーワードを使えば、列挙型にも自己可変メソッドを定義できます。
+例えば、以下に示す`turnRight()`メソッドは、自身のインスタンスが示す方位を90度だけ右に回転します。
 
 ```swift
 enum Direction: Int {
@@ -237,14 +247,30 @@ enum Direction: Int {
 }
 
 var currentDirection = Direction.east
-currentDirection.turnRight()    // southern
+currentDirection.turnRight()
+currentDirection        // southern
 ```
+
+`turnRight()`メソッドは自身のインスタンスを更新するために、`self`に対して新しい列挙ケース値を設定しています。
+
+***
+
+`static`キーワードを使えば、列挙型に型メソッドを定義することもできます。
 
 
 ## 列挙型のプロパティ
+_0\_enumeration properties.playground_
 
-列挙型に定義できるのは、計算プロパティだけ
-通常のプロパティやプロパティ・オブザーバは列挙型に定義できない
+列挙型にはメソッドの他に、プロパティを定義できます。
+ただし、定義できるのは計算プロパティだけです。
+通常のプロパティやプロパティ・オブザーバは列挙型に定義できません。
+
+***
+
+列挙型の計算プロパティは、構造体などと同じように実装できます。
+
+以下に定義する`Direction`型は東西南北の方位をモデル化する列挙型です。
+変数`isHeadingNorth`は、自身のインスタンスが「北を向いているかどうか」を返す計算プロパティです。
 
 ```swift
 enum Direction: Int {
@@ -256,12 +282,13 @@ enum Direction: Int {
 }
 
 var currentDirection = Direction.east
-currentDirection.isHeadingNorth
+currentDirection.isHeadingNorth     // false
 ```
 
+`isHeadingNorth`プロパティの実装では、三項演算子を使って自身のインスタンスが「列挙ケースの`notrh`と等しいかどうか」を評価しています。
 
 ## 5.  列挙型の付属値
-_02_associated values.playground_
+_05\_associated values.playground_
 
 通常、列挙型の値とは「そこに定義されたケース自体」のことです。
 列挙型の値に、列挙ケースではない「具体的なデータ型の値」を設定できると便利な場合があります。
