@@ -341,7 +341,8 @@ enum BookData {
 変数インスタンスであれば、値を更新することもできます。
 
 ```swift
-var bookInformation = Book.title("The complete peanuts")
+var bookInformation = Book
+Data.title("The complete peanuts")
 bookInformation = .isbn(symbol: 987, region: 4, publisher: 309, title: 62911, checkdigit: 7)
 ```
 
@@ -354,41 +355,100 @@ bookInformation = .isbn(symbol: 987, region: 4, publisher: 309, title: 62911, ch
 ## 6.Switch分岐構文の基本
 _06_switch statements.playground_
 
-注文された飲み物のサイズに基づいて、出力するメッセージを制御するプログラム
-評価値と一致するケース節の手続きが実行される
-それ以外の結果は、default節で対応する
-breakキーワードを使えば、何もしないでswitchステートメントを修了できる
+if条件分岐構文はコードの実行フローを制御することができます。
+それとは別のフロー制御構文として、switchステートメントがあります。
+switch分岐構文は、評価すべき値が「どのケースに該当するか」に基づいて、実行フローを制御します。
+
++++
+
+以降、switch分岐構文の基本を解説するために、レストランの人気度を「星の数」で表すプログラムを例に挙げます。
+例えば、最高度の人気を「三ツ星」で表す場合は、変数`numberOfStars`に`3`を設定できます。
 
 ```swift
-var orderedDrinkSize = "M"
-switch orderedDrinkSize {
-case "S":
-    print("A small drink was ordered.")
-case "M":
-    print("A medium drink was ordered.")
-case "L":
-    print("A large drink was ordered.")
-default:
-    break
+var numberOfStars = 3
+```
+
+「人気度を表す星の数」を評価して、実行フローを制御するswitch分岐構文は以下のように記述できます。
+このswitch分岐構文における評価値は変数`numberOfStars`です。
+つまり、変数`numberOfStars`が用意されたケースのどれに該当するかを、上から順番に評価します。
+
+```swift
+switch numberOfStars {
+case 1:
+    print("⭐️")
+case 2:
+    print("⭐️⭐️")
+case 3:
+    print("⭐️⭐️⭐️")
 }
 ```
 
-strawberryの規格
-Sサイズ:  6g~10g
-Mサイズ:  10~15g
-Lサイズ:  15~20g
-2Lサイズ: 20~28g
-3Lサイズ: 28~37g
-デラックス: 37g〜
+このswitchステートメントは変数`numberOfStars`が`1`なら⭐️をひとつ、`2`なら⭐️をふたつ、`3`なら⭐️をみっつだけ出力するコードを実行します。
+ただし、コンパイラは上のswitchステートメントに対して構文エラーを報告します。
+このswitchステートメントは「評価値が`1`か`2`か`3`になるケース」しか考慮していないからです。
+
+コンパイラはswitchステートメントに対して網羅性を要求します。
+つまり、このエラーを解消するには、評価値が`1`から`3`以外のどんな整数になっても、ケースに該当するように考慮しなければいけません。
+すべての整数に対応するために、ひとつずつケースを用意することは現実的ではありません。
+用意したケースのいずれにも評価値が該当しなかった場合は、dafault節でカバーできます。
 
 ```swift
-var spec = "out of spec"   // before evaluation
-var wightOfstrawberry = 10  // grams
-switch wightOfstrawberry {
-case let weight where weight <= 6:
-    spec = "S"
+switch numberOfStars {
+case 1:
+    print("⭐️")
+case 2:
+    print("⭐️⭐️")
+case 3:
+    print("⭐️⭐️⭐️")
 default:
-    spec = "Deluxe"
+    print("No rating...")
 }
-print("The strawberry is \(spec) size.")
+// Prints "⭐️⭐️⭐️"
+```
+
+上のswitchステートメントが示すように、default節は常にすべてのケースの最後に配置します。
+
++++
+
+switchステートメントを利用する利点は、コンパイラによって分岐の網羅性が検査されることです。
+ifステートメントにはないこの仕組みのおかげで、より堅牢なプログラムを構築できます。
+
+## 列挙ケースを評価するSwitchステートメント
+_\_.playground_
+
+```swift
+enum Rating {
+    case good, better, exellent
+}
+var stars: Rating = .good
+```
+
+```swift
+switch stars {
+case .good:
+    print("⭐️")
+case .better:
+    print("⭐️⭐️")
+case .exellent:
+    print("⭐️⭐️⭐️")
+}
+```
+
+## 列挙ケースの実体値を抽出するSwitchステートメント
+
+```swift
+enum BookData {
+    case title(String)
+    case isbn(Int, Int, Int, Int, Int)
+}
+var bookInformation = BookData.isbn(987, 4, 309, 62911, 7)
+```
+
+```swift
+switch bookInformation {
+case let .title(bookTitle):
+    print("Title: \(bookTitle)")
+case let .isbn(symbol, region, publisher, title, checkdigit):
+    print("ISBN: \(symbol)-\(region)-\(publisher)-\(title)-\(checkdigit)")
+}
 ```
