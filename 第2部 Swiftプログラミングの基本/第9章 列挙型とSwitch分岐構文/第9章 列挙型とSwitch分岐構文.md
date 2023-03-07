@@ -368,9 +368,9 @@ switch分岐構文は、評価すべき値が「どのケースに該当する�
 var numberOfStars = 3
 ```
 
-「人気度を表す星の数」を評価して、実行フローを制御するswitch分岐構文は以下のように記述できます。
-このswitch分岐構文における評価値は変数`numberOfStars`です。
-つまり、変数`numberOfStars`が用意されたケースのどれに該当するかを、上から順番に評価します。
+人気度を表す「星の数」を評価して、実行フローを制御するswitch分岐構文は以下のように記述できます。
+このswitch分岐構文において、変数`numberOfStars`は評価値です。
+つまり、switchステートメントは「変数`numberOfStars`が用意されたケースのどれに該当するか」を、上から順番に評価します。
 
 ```swift
 switch numberOfStars {
@@ -381,6 +381,7 @@ case 2:
 case 3:
     print("⭐️⭐️⭐️")
 }
+// error; Switch must be exhaustive
 ```
 
 このswitchステートメントは変数`numberOfStars`が`1`なら⭐️をひとつ、`2`なら⭐️をふたつ、`3`なら⭐️をみっつだけ出力するコードを実行します。
@@ -388,7 +389,7 @@ case 3:
 このswitchステートメントは「評価値が`1`か`2`か`3`になるケース」しか考慮していないからです。
 
 コンパイラはswitchステートメントに対して網羅性を要求します。
-つまり、このエラーを解消するには、評価値が`1`から`3`以外のどんな整数になっても、ケースに該当するように考慮しなければいけません。
+つまり、このエラーを解消するには「評価値が`1`から`3`以外の整数になっても、いずれかのケースに該当する」ようにしなければいけません。
 すべての整数に対応するために、ひとつずつケースを用意することは現実的ではありません。
 用意したケースのいずれにも評価値が該当しなかった場合は、**dafault節**でカバーできます。
 
@@ -403,7 +404,7 @@ case 3:
 default:
     print("No rating...")
 }
-// Prints "⭐️⭐️⭐️"
+// Prints ⭐️⭐️⭐️
 ```
 
 上のswitchステートメントが示すように、default節は常にすべてのケースの最後に配置します。
@@ -415,7 +416,7 @@ switchステートメントを利用する利点は、コンパイラによっ�
 ifステートメントにはないこの仕組みのおかげで、より堅牢なプログラムを構築できます。
 
 ## 8. 列挙ケースを評価するSwitchステートメント
-_08\_switch statement to evaluate enumerations.playground_
+_08\_matching enumeration values with switch statement.playground_
 
 レストランの人気度を3段階で示す場合、あらかじめ人気度を「3段階しか設定できないようにする」ことは妥当です。
 例えば、「良い、なお良い、素晴らしい」といった3段階が考えられるかもしれません。
@@ -430,6 +431,8 @@ var stars: Rating = .good
 ```
 
 列挙型インスタンスを評価するswitchステートメントは、各switchケースで「どの列挙ケースに該当するか」を記述できます。
+下のswitchステートメントは評価値の`stars`が`good`なら⭐️をひとつ、`better`なら⭐️をふたつ、`excellent`なら⭐️をみっつだけ出力します。
+そして、`non`だった場合は「評価なし」の旨を伝えます。
 
 ```swift
 switch stars {
@@ -442,13 +445,16 @@ case .excellent:
 case .non:
     print("No rating...")
 }
+// Prints ⭐️
 ```
 
 列挙型インスタンスをswitchステートメントで利用すると、より現実的な範囲で評価値を網羅できます。
 
-## 列挙ケースの実体値を抽出するSwitchステートメント
-_0\_.playground_
+## 9. 列挙ケースの付属値を抽出するSwitchステートメント
+_09\_switch statement that extract associated values.playground_
 
+
+付属値のある列挙型
 
 ```swift
 enum BookData {
@@ -458,6 +464,24 @@ enum BookData {
 var bookInformation = BookData.isbn(987, 4, 309, 62911, 7)
 ```
 
+
+付属値を抽出
+バインド
+
+
+```swift
+switch bookInformation {
+case .title(let bookTitle):
+    print("Title: \(bookTitle)")
+case .isbn(let symbol, let region, let publisher, let title, let checkdigit):
+    print("ISBN: \(letsymbol)-\(region)-\(publisher)-\(title)-\(checkdigit)")
+}
+// Prints ISBN: 987-4-309-62911-7
+```
+
+上のswitchステートメントは、用意された各ケースで「列挙ケースの付属値の全部分」を定数に抽出しています。
+そのような場合は、`let`キーワードをまとめてswitchケース直後に配置できます。
+
 ```swift
 switch bookInformation {
 case let .title(bookTitle):
@@ -466,3 +490,5 @@ case let .isbn(symbol, region, publisher, title, checkdigit):
     print("ISBN: \(symbol)-\(region)-\(publisher)-\(title)-\(checkdigit)")
 }
 ```
+
+`var`キーワードを使って、変数として抽出することもできる
