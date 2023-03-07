@@ -290,75 +290,66 @@ currentDirection.isHeadingNorth     // false
 ## 5.  列挙型の付属値
 _05\_associated values.playground_
 
-通常、列挙型の値とは「そこに定義されたケース自体」のことです。
-列挙型の値に、列挙ケースではない「具体的なデータ型の値」を設定できると便利な場合があります。
-列挙ケースに**付属値**を定義しておくと、より具体的な値を設定できるようになります。
+通常、列挙型のインスタンスは「定義されたケース値」です。
+列挙型のインスタンスに「より具体的なデータ」を設定できると便利な場合があります。
+列挙ケースに**付属値**を定義しておくと、より具体的な値を設定できます。
 
-以降の例では、連絡先をメールアドレスと電話番号の2つの形式で追跡するプログラムを考えます。
++++
 
-下に定義する`Contact`型は、2つのケースがある列挙型です。
-ケースはそれぞれ、メールアドレスと電話番号を示します。
+例えば、図書館で本を探すときには図書検索システムを利用できますが、「本のタイトル」で検索すると同じ名前の本が複数見つかるかもしれません。
+そのような場合、ISBNコードで検索すると目的の本だけを検索できます。
+ISBNは図書識別のために設けられた13桁の国際規格コードです。
+スヌーピーの連載70周年に刊行された「ピーナッツ全集」は全部で25巻あります。
+11巻を探したい場合、題名の「ピーナッツ全集」で検索すると複数ヒットしてしまいます。
+ただし、ISBNコードの「978-4-309-62911-7」を知っていれば、そのような問題は回避できます。
+
+以下に定義する`BookData`型は、検索情報を2つのケースから選べるようにモデル化した列挙型です。
 
 ```swift
-enum Contact {
-    case email
-    case phone
+enum BookData {
+    case title
+    case isbn
 }
 ```
 
-`Contact`型のケース値は「メールアドレス」と「電話番号」のどちらかを選択するだけです。
-つまり、具体的なメールアドレスや電話番号は保持できないということです。
-しかしながら、列挙型に付属値を定義することで、その具体的な値も付加的に保持できるようになります。
+この`BookData`型は「本の題名で検索するか、ISBNコードで検索するか」を選択できますが、それが実際にどんな情報かは指定できません。
 
-列挙型に付属値を定義するには、ケースの後に括弧`()`をつけて「具体的な値の型」を指定します。
+列挙型に付属値を定義すると、「そのケースが具体的にどんな情報か」を付加的に保持できます。
+列挙型に付属値を定義するには、ケースの後に括弧`()`をつけて「その情報が示すデータ型」を指定します。
 
 ```swift
-enum Contact {
-    case email(String)
-    case phone(Int, Int, Int)
+enum BookData {
+    case title(String)
+    case isbn(Int, Int, Int, Int, Int)
 }
 ```
 
-上のように定義した`Contact`型の付属値は、メールアドレスが文字列で、電話番号は3つの整数で構成されることを意味しています。
+列挙型の付属値はタプル形式で指定できます。
+上の定義における`isbn`ケースでは、ISBNコードの付属値が「5組の整数で構成される」ことを表現しています。
+
+ケースの付属値はタプル形式なので、ラベルを指定することもできます。
+下の`isbn`ケースに指定した付属値は、ISBNの各整数が「記号、地域、出版社、題名、チェック係数」であることを示しています。
 
 ```swift
-let friendContact = Contact.email("hello@iCloud.com")
-let myPrivatePhone: Contact = 
-print(friendContact)
-```
-
-
-
-```swift
-friendContact = .phone(090, 1234, 5678)
-print(friendContact)
-```
-
-
-列挙型の実体値と付属値はまったく異なる概念です。
-実体値とは「列挙型を定義する際にあらかじめ値を設定しておく」ものです。
-つまり、列挙型の実体値は変更できません。
-対照的に、付属値は列挙ケースに基づいて「定数や変数を新たに作成するときに割り当てる値」です。
-付属値は定数や変数を作成した後も、型が適切であれば何度でも値を更新できます。
-
-
-```swift
-// 書籍の在庫追跡システム
-// 国際標準図書番号（International Standard Book Number）は「どこの国の、何という名称の出版者が発行する、何という書名の書籍か」を識別する
-// prefix-country-publisher-symbol-check digit
-// 123-4-567-89012-3
-// 978-4-309-47450-0（原題; 21 Lessons）
-
-enum Book {
+enum BookData {
     case title(String)
     case isbn(symbol: Int, region: Int, publisher: Int, title: Int, checkdigit: Int)
 }
-
-var bookInfomation = Book.title("A Brief History of Humankind")
-print(bookInfomation)   // Prints title("A Brief History of Humankind")
-
-bookInfomation = .isbn(symbol: 987, region: 4, publisher: 309, title: 46745, checkdigit: 0)
 ```
+
+列挙型の付属値は、インスタンス初期化時に「そのケースがどんな情報か」を設定します。
+変数インスタンスであれば、値を更新することもできます。
+
+```swift
+var bookInformation = Book.title("The complete peanuts")
+bookInformation = .isbn(symbol: 987, region: 4, publisher: 309, title: 62911, checkdigit: 7)
+```
+
+列挙型の付属値は、実体値とまったく異なる概念です。
+付属値は列挙ケースごとに設定できる「具体的な情報」です。
+変数の列挙型インスタンスに対しては付属値を後から更新できます。
+対照的に、実体値は「列挙型を定義する際にあらかじめ設定しておく値」です。
+そのため、作成した列挙型インスタンスが変数であっても、実体値は変更できません。
 
 ## 6.Switch分岐構文の基本
 _06_switch statements.playground_
