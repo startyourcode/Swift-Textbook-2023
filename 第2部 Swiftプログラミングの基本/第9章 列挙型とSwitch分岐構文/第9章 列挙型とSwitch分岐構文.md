@@ -204,8 +204,8 @@ let diractionNorth = Direction()    // north
 それとは異なり、列挙型の初期化手続きでは、`self`キーワードで参照した自身のインスタンスに「任意の列挙ケース値」を設定します。
 なお、`init(rawValue:)?`メソッドを実装すれば、自動的に提供される「実体値を指定するイニシャライザ」も上書き定義できます。
 
-## 列挙型のメソッド
-_0\_enumeration methods.playground_
+## 5. 列挙型のメソッド
+_05\_enumeration methods.playground_
 
 Swiftの列挙型はデータをモデル化する正当な手段のひとつであり、れっきとした型として扱えます。
 これは、構造体などと同じようにメソッドを定義できることを意味します。
@@ -258,8 +258,8 @@ currentDirection        // southern
 `static`キーワードを使えば、列挙型に型メソッドを定義することもできます。
 
 
-## 列挙型のプロパティ
-_0\_enumeration properties.playground_
+## 6. 列挙型のプロパティ
+_06\_enumeration properties.playground_
 
 列挙型にはメソッドの他に、プロパティを定義できます。
 ただし、定義できるのは計算プロパティだけです。
@@ -352,11 +352,11 @@ bookInformation = .isbn(symbol: 987, region: 4, publisher: 309, title: 62911, ch
 対照的に、実体値は「列挙型を定義する際にあらかじめ設定しておく値」です。
 そのため、作成した列挙型インスタンスが変数であっても、実体値は変更できません。
 
-## 6.Switch分岐構文の基本
-_06_switch statements.playground_
+## 7.Switch分岐構文の基本
+_07|_switch statements.playground_
 
 if条件分岐構文はコードの実行フローを制御することができます。
-それとは別のフロー制御構文として、switchステートメントがあります。
+それとは別のフロー制御構文として、**switchステートメント**があります。
 switch分岐構文は、評価すべき値が「どのケースに該当するか」に基づいて、実行フローを制御します。
 
 +++
@@ -390,7 +390,7 @@ case 3:
 コンパイラはswitchステートメントに対して網羅性を要求します。
 つまり、このエラーを解消するには、評価値が`1`から`3`以外のどんな整数になっても、ケースに該当するように考慮しなければいけません。
 すべての整数に対応するために、ひとつずつケースを用意することは現実的ではありません。
-用意したケースのいずれにも評価値が該当しなかった場合は、dafault節でカバーできます。
+用意したケースのいずれにも評価値が該当しなかった場合は、**dafault節**でカバーできます。
 
 ```swift
 switch numberOfStars {
@@ -407,21 +407,29 @@ default:
 ```
 
 上のswitchステートメントが示すように、default節は常にすべてのケースの最後に配置します。
+この場合のdefault節は、評価値が`0`や`5`であっても該当します。
 
 +++
 
 switchステートメントを利用する利点は、コンパイラによって分岐の網羅性が検査されることです。
 ifステートメントにはないこの仕組みのおかげで、より堅牢なプログラムを構築できます。
 
-## 列挙ケースを評価するSwitchステートメント
-_\_.playground_
+## 8. 列挙ケースを評価するSwitchステートメント
+_08\_switch statement to evaluate enumerations.playground_
+
+レストランの人気度を3段階で示す場合、あらかじめ人気度を「3段階しか設定できないようにする」ことは妥当です。
+例えば、「良い、なお良い、素晴らしい」といった3段階が考えられるかもしれません。
+
+下に定義する`Rating`型は、3段階の評価される人気度をモデル化した列挙型です。
 
 ```swift
 enum Rating {
-    case good, better, exellent
+    case good, better, excellent, non
 }
 var stars: Rating = .good
 ```
+
+列挙型インスタンスを評価するswitchステートメントは、各switchケースで「どの列挙ケースに該当するか」を記述できます。
 
 ```swift
 switch stars {
@@ -429,12 +437,18 @@ case .good:
     print("⭐️")
 case .better:
     print("⭐️⭐️")
-case .exellent:
+case .excellent:
     print("⭐️⭐️⭐️")
+case .non:
+    print("No rating...")
 }
 ```
 
+列挙型インスタンスをswitchステートメントで利用すると、より現実的な範囲で評価値を網羅できます。
+
 ## 列挙ケースの実体値を抽出するSwitchステートメント
+_0\_.playground_
+
 
 ```swift
 enum BookData {
