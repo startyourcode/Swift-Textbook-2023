@@ -3,7 +3,7 @@
 あるデータについて、それがどのように変化できるかを予め制限しておくと便利な場合があります。
 例えば、カフェで注文する飲み物サイズを示すデータについて、「S, M, L」のいずれかだけに設定できるようにすることは妥当です。
 このようなデータは**列挙型**としてモデル化できます。
-そして、列挙型を**Switch分岐構文**で利用すると、コードの安全性が向上します。
+そして、列挙型を**switch分岐構文**で利用すると、コードの安全性が向上します。
 Switch分岐構文は、ifステートメントのように「どの実行するコードすべきか」を制御する仕組みです。
 
 ## 1. 列挙型の基本
@@ -368,9 +368,9 @@ switch分岐構文は、評価すべき値が「どのケースに該当する�
 var numberOfStars = 3
 ```
 
-人気度を表す「星の数」を評価して、実行フローを制御するswitch分岐構文は以下のように記述できます。
-このswitch分岐構文において、変数`numberOfStars`は評価値です。
-つまり、switchステートメントは「変数`numberOfStars`が用意されたケースのどれに該当するか」を、上から順番に評価します。
+「星の数」に基づいて実行フローを制御するswitch分岐構文は、以下のように記述できます。
+このswitch分岐構文における変数`numberOfStars`は評価値です。
+そして、`case`キーワードで記述された分岐先のケースが3つあります。
 
 ```swift
 switch numberOfStars {
@@ -384,13 +384,14 @@ case 3:
 // error; Switch must be exhaustive
 ```
 
-このswitchステートメントは変数`numberOfStars`が`1`なら⭐️をひとつ、`2`なら⭐️をふたつ、`3`なら⭐️をみっつだけ出力するコードを実行します。
+switchステートメントは常に、「評価値がどのケースと一致するか」を上から順番に評価します。
+つまり、このswitchステートメントは変数`numberOfStars`が`1`なら⭐️をひとつ、`2`なら⭐️をふたつ、`3`なら⭐️をみっつだけ出力するコードを実行します。
 ただし、コンパイラは上のswitchステートメントに対して構文エラーを報告します。
 このswitchステートメントは「評価値が`1`か`2`か`3`になるケース」しか考慮していないからです。
 
-コンパイラはswitchステートメントに対して網羅性を要求します。
+Swiftのswitchステートメントには網羅性が要求されます。
 つまり、このエラーを解消するには「評価値が`1`から`3`以外の整数になっても、いずれかのケースに該当する」ようにしなければいけません。
-すべての整数に対応するために、ひとつずつケースを用意することは現実的ではありません。
+しかしながら、すべての整数に対応するためにひとつずつケースを用意することは現実的ではありません。
 用意したケースのいずれにも評価値が該当しなかった場合は、**dafault節**でカバーできます。
 
 ```swift
@@ -407,8 +408,8 @@ default:
 // Prints ⭐️⭐️⭐️
 ```
 
-上のswitchステートメントが示すように、default節は常にすべてのケースの最後に配置します。
-この場合のdefault節は、評価値が`0`や`5`であっても該当します。
+上のswitchステートメントにおけるdefault節は、評価値が`0`や`5`であっても該当します。
+なお、default節は常にすべてのケースの最後に配置します。
 
 +++
 
@@ -454,31 +455,49 @@ case .non:
 ## 9. 列挙ケースの付属値を抽出するSwitchステートメント
 _09\_switch statement that extract associated values.playground_
 
+列挙型インスタンスの付属値は「列挙ケースに付加された情報」であり、それを通常の値として扱うことはできません。
+ただし、switch分岐構文のパターンマッチングを利用すると、列挙ケースから付属値だけを取り出すことができます。
+ここでは、図書検索システムで扱う書籍情報を例に挙げて解説します。
 
-付属値のある列挙型
+以下に定義する`BookData`型は、検索対象となる書籍情報をモデル化した列挙型です。
+2つのケースは、書籍検索に「題名」あるいは「ISBNコード」が利用できることを示しています。
+また、それぞれのケースには付属値があり、題名は`String`型の値で、ISBNは「5組の`Int`型からなるタプル」です。
 
 ```swift
 enum BookData {
     case title(String)
     case isbn(Int, Int, Int, Int, Int)
 }
-var bookInformation = BookData.isbn(987, 4, 309, 62911, 7)
+let bookInformation = BookData.isbn(987, 4, 309, 62911, 7)
 ```
 
+作成した定数`bookInformation`は`isbn`ケースの付属値が設定された列挙型インスタンスです。
+通常、列挙型インスタンスを評価するswitchステートメントは「それがどの列挙ケースと一致するか」に基づいてコードを実行するだけです。
 
-付属値を抽出
-バインド
+```swift
+switch bookInformation {
+case .title:
+    print("Search by title.")
+case .isbn:
+    print("Search by ISBN.")
+}
+// Prints Search by ISBN.
+```
 
+switchケースで定数および変数を宣言すると、そこに付属値を抽出できます。
 
 ```swift
 switch bookInformation {
 case .title(let bookTitle):
-    print("Title: \(bookTitle)")
+    print("Search by title: \(bookTitle).")
 case .isbn(let symbol, let region, let publisher, let title, let checkdigit):
-    print("ISBN: \(letsymbol)-\(region)-\(publisher)-\(title)-\(checkdigit)")
+    print("Search by ISBN: \(letsymbol)-\(region)-\(publisher)-\(title)-\(checkdigit).")
 }
-// Prints ISBN: 987-4-309-62911-7
+// Prints Search by ISBN: 987-4-309-62911-7.
 ```
+
+このようにして、データを取り出す方法を値の**バインド**といいます。
+バインドされた値は、そのswitchケースが実行するコード内で「通常の値」として扱えます。
 
 上のswitchステートメントは、用意された各ケースで「列挙ケースの付属値の全部分」を定数に抽出しています。
 そのような場合は、`let`キーワードをまとめてswitchケース直後に配置できます。
@@ -490,6 +509,5 @@ case let .title(bookTitle):
 case let .isbn(symbol, region, publisher, title, checkdigit):
     print("ISBN: \(symbol)-\(region)-\(publisher)-\(title)-\(checkdigit)")
 }
+// Prints Search by ISBN: 987-4-309-62911-7.
 ```
-
-`var`キーワードを使って、変数として抽出することもできる
